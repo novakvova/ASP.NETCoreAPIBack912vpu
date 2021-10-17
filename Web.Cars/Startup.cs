@@ -1,3 +1,4 @@
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Web.Cars.Data;
 using Web.Cars.Data.Identity;
+using Web.Cars.Mapper;
 
 namespace Web.Cars
 {
@@ -55,6 +57,8 @@ namespace Web.Cars
             services.AddCors();
             services.AddFluentValidation(x =>
                x.RegisterValidatorsFromAssemblyContaining<Startup>());
+
+            services.AddAutoMapper(typeof(AppMapProfile));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
