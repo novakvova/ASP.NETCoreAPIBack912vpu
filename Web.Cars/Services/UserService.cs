@@ -37,7 +37,7 @@ namespace Web.Cars.Services
 
                 string dirPath = Path.Combine(Directory.GetCurrentDirectory(), "images");
                 fileName = Path.Combine(dirPath, randomFilename);
-                using (var file = System.IO.File.Create(fileName))
+                using (var file = File.Create(fileName))
                 {
                     model.Photo.CopyTo(file);
                 }
@@ -48,7 +48,7 @@ namespace Web.Cars.Services
             if (!result.Succeeded)
             {
                 if (!string.IsNullOrEmpty(fileName))
-                    System.IO.File.Delete(fileName);
+                    File.Delete(fileName);
 
                 AccountError accountError = new AccountError();
                 foreach (var item in result.Errors)
