@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Web.Cars.Abstract;
 using Web.Cars.Data;
 using Web.Cars.Data.Identity;
 using Web.Cars.Mapper;
@@ -45,7 +46,7 @@ namespace Web.Cars
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 5;
+                options.Password.RequiredLength = 6;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
@@ -65,6 +66,7 @@ namespace Web.Cars
             services.AddAutoMapper(typeof(AppMapProfile));
 
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IUserService, UserService>();
 
             var signinKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<String>("JwtKey")));
 

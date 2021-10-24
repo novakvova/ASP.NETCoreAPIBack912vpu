@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Web.Cars.Abstract;
 using Web.Cars.Data.Identity;
+using Web.Cars.Exceptions;
 using Web.Cars.Models;
 using Web.Cars.Services;
 
@@ -17,57 +19,32 @@ namespace Web.Cars.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly IMapper _mapper;
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly IJwtTokenService _jwtTokenService;
+        private readonly IUserService _userService;
 
-        public AccountController(UserManager<AppUser> userManager,
-            IJwtTokenService jwtTokenService,
-            SignInManager<AppUser> signInManager,
-            IMapper mapper)
+        public AccountController(IUserService userService)
         {
-            _mapper = mapper;
-            _userManager = userManager;
-            _jwtTokenService = jwtTokenService;
-            _signInManager = signInManager;
+            _userService = userService;
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm]RegisterViewModel model)
         {
-            var user = _mapper.Map<AppUser>(model);
-            string fileName = String.Empty;
-            if (model.Photo != null)
+            try
             {
-                string randomFilename = Path.GetRandomFileName() +
-                    Path.GetExtension(model.Photo.FileName);
-
-                string dirPath = Path.Combine(Directory.GetCurrentDirectory(), "images");
-                fileName = Path.Combine(dirPath, randomFilename);
-                using (var file = System.IO.File.Create(fileName))
+                string token = await _userService.CreateUser(model);
+                return Ok(new
                 {
-                    model.Photo.CopyTo(file);
-                }
-                user.Photo = randomFilename;
+                    token
+                });
             }
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
+            catch (AccountException aex)
             {
-                if (!string.IsNullOrEmpty(fileName))
-                    System.IO.File.Delete(fileName);
-                return BadRequest(result.Errors);
+                return BadRequest(aex.AccountError);
             }
-            //result = await _userManager.AddToRoleAsync(user, "user");
-            //if (!result.Succeeded)
-            //{
-            //    return BadRequest(result.Errors);
-            //}
-
-            return Ok(new
+            catch(Exception ex)
             {
-                token = _jwtTokenService.CreateToken(user)
-            });
+                return BadRequest(new AccountError("Щось пішло не так! "+ ex.Message));
+            }
+            
         }
     }
 }
