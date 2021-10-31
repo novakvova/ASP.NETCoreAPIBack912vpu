@@ -48,7 +48,7 @@ namespace Web.Cars.Services
 
             var jwt = new JwtSecurityToken(
                 signingCredentials: signinCredentials,
-                expires: DateTime.Now.AddDays(1000),
+                expires: DateTime.Now.AddHours(6),
                 claims: claims
             );
             return new JwtSecurityTokenHandler().WriteToken(jwt);
