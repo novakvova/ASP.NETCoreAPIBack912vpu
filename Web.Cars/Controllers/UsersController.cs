@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Web.Cars.Data;
+using Web.Cars.Exceptions;
 using Web.Cars.Models;
 
 namespace Web.Cars.Controllers
@@ -27,6 +29,7 @@ namespace Web.Cars.Controllers
         [HttpGet]
         public IActionResult GetUsers()
         {
+            Thread.Sleep(2000);
             var list = _context.Users
                 .Select(x=>_mapper.Map<UserItemViewModel>(x))
                 .ToList();
@@ -37,6 +40,7 @@ namespace Web.Cars.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            Thread.Sleep(2000);
             try
             {
                 var user = _context.Users.SingleOrDefault(x=>x.Id==id);
@@ -57,6 +61,34 @@ namespace Web.Cars.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { invalid = "Something went wrong on server " + ex.Message });
+            }
+        }
+
+        [Route("edit/{id}")]
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            Thread.Sleep(2000);
+            var user = _context.Users
+                .SingleOrDefault(x => x.Id == id);
+            return Ok(_mapper.Map<UserEditViewModel>(user));
+        }
+
+        [HttpPost("save")]
+        public async Task<IActionResult> Save([FromForm] UserSaveViewModel user)
+        {
+            return BadRequest();
+            try
+            {
+                
+            }
+            catch (AccountException aex)
+            {
+                return BadRequest(aex.AccountError);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new AccountError("Щось пішло не так! " + ex.Message));
             }
         }
     }
