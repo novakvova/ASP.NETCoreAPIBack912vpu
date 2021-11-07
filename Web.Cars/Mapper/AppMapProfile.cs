@@ -15,8 +15,9 @@ namespace Web.Cars.Mapper
             CreateMap<RegisterViewModel, AppUser>()
                 .ForMember(x => x.Photo, opt => opt.Ignore())
                 .ForMember(x => x.UserName, opt => opt.MapFrom(x => x.Email));
-            //.ForMember(x => x.Image, opt => opt.MapFrom(x => "images/"
-            //    + (string.IsNullOrEmpty(x.Photo) ? "noimage.jpg" : x.Photo)));
+
+            CreateMap<AppUser, UserItemViewModel>()
+                .ForMember(x => x.Image, opt => opt.MapFrom(x=> "/images/" + x.Photo));
         }
     }
 }
