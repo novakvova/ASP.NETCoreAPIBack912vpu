@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Web.Cars.Abstract;
 using Web.Cars.Data;
 using Web.Cars.Exceptions;
 using Web.Cars.Models;
@@ -18,11 +19,14 @@ namespace Web.Cars.Controllers
     public class UsersController : ControllerBase
     {
         private readonly AppEFContext _context;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
         public UsersController(AppEFContext context,
+            IUserService userService,
             IMapper mapper)
         {
             _context = context;
+            _userService = userService;
             _mapper = mapper;
         }
         [Route("all")]
@@ -74,13 +78,13 @@ namespace Web.Cars.Controllers
             return Ok(_mapper.Map<UserEditViewModel>(user));
         }
 
-        [HttpPost("save")]
-        public async Task<IActionResult> Save([FromForm] UserSaveViewModel user)
+        [HttpPut("save")]
+        public IActionResult Save([FromForm] UserSaveViewModel model)
         {
-            return BadRequest();
             try
             {
-                
+                _userService.UpdateUser(model);
+                return Ok();
             }
             catch (AccountException aex)
             {
