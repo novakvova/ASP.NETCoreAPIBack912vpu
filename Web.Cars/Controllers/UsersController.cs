@@ -35,9 +35,27 @@ namespace Web.Cars.Controllers
         {
             Thread.Sleep(2000);
             var list = _context.Users
-                .Select(x=>_mapper.Map<UserItemViewModel>(x))
+                .Select(x => _mapper.Map<UserItemViewModel>(x))
                 .ToList();
             return Ok(list);
+        }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromForm] RegisterViewModel model)
+        {
+            try
+            {
+                string token = await _userService.CreateUser(model);
+                return Ok();
+            }
+            catch (AccountException aex)
+            {
+                return BadRequest(aex.AccountError);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new AccountError("Щось пішло не так! " + ex.Message));
+            }
         }
 
         [Route("delete/{id}")]
@@ -47,8 +65,8 @@ namespace Web.Cars.Controllers
             Thread.Sleep(2000);
             try
             {
-                var user = _context.Users.SingleOrDefault(x=>x.Id==id);
-                if(user==null)
+                var user = _context.Users.SingleOrDefault(x => x.Id == id);
+                if (user == null)
                     return NotFound();
 
                 if (user.Photo != null)
@@ -68,9 +86,9 @@ namespace Web.Cars.Controllers
             }
         }
 
-        [Route("edit/{id}")]
+        [Route("get/{id}")]
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult GetUserById(int id)
         {
             Thread.Sleep(2000);
             var user = _context.Users
@@ -78,8 +96,8 @@ namespace Web.Cars.Controllers
             return Ok(_mapper.Map<UserEditViewModel>(user));
         }
 
-        [HttpPut("save")]
-        public IActionResult Save([FromForm] UserSaveViewModel model)
+        [HttpPut("edit")]
+        public IActionResult Edit([FromForm] UserSaveViewModel model)
         {
             try
             {
